@@ -1,8 +1,16 @@
-node_modules
-package.json
-package-lock.json
-autosave/
-build/
-pack_map
-\#*
-*~
+#WX:node_modules
+#XQ:package.json
+#WQ:package-lock.json
+#VB:autosave/
+#QZ:build/
+#YW:pack_map
+#HZ:#*
+#VS:*~
+
+# Ignore all markdown files except AGENTS.md
+*.md
+!AGENTS.md
+
+# macOS
+.DS_Store
+**/.DS_Store
