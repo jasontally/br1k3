@@ -25,7 +25,7 @@ from tb_mcp.map_parser import parse_map, parse_map_file, ParseError
 from tb_mcp.map_writer import write_map, write_map_to_string
 
 # Configuration
-PROJECT_DIR = Path("/Users/jtally/s1k3")
+PROJECT_DIR = Path("/Users/jtally/br1k3")
 MAPS_DIR = PROJECT_DIR / "assets/maps"
 BUILD_DIR = PROJECT_DIR / "build"
 PACK_MAP = PROJECT_DIR / "pack_map"
