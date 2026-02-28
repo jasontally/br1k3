@@ -3177,3 +3177,13 @@
     "dir" "0"
 }
 
+
+{
+    "classname" "pickup_grenadelauncher"
+    "origin" "1600 2600 450"
+}
+
+{
+    "classname" "pickup_health"
+    "origin" "500 500 650"
+}
