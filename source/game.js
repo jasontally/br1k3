@@ -21,6 +21,11 @@ game_init = (map_index) => {
 
 	game_map_index = map_index;
 	map_init(map_data[game_map_index]);
+	
+	// Initialize arena showdown mode for first map only
+	if (map_index === 0 && typeof arena_init === 'function') {
+		arena_init();
+	}
 },
 
 game_next_level = () => {

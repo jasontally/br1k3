@@ -112,6 +112,8 @@ map_init = (m) => {
 		/* 14 */ entity_door_t,
 		/* 15 */ entity_pickup_key_t,
 		/* 16 */ entity_torch_t,
+		/* 17 */ entity_spawn_point_t,
+		/* 18 */ entity_safe_zone_t,
 	];
 
 	// Parse entity data and spawn all entities for this map
