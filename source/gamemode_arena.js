@@ -46,13 +46,10 @@ arena_init = () => {
 	// Spawn safe zone in center of arena
 	arena_safe_zone = game_spawn(entity_safe_zone_t, vec3(1000, 0, 1500), 2500, 0);
 	
-	// Random spawn for player
-	let spawn = arena_spawn_points[Math.floor(Math.random() * arena_spawn_points.length)];
+	// Player keeps original map spawn position
+	// Just reset velocity to ensure clean start
 	if (typeof game_entity_player !== 'undefined' && game_entity_player) {
-		let player = game_entity_player;
-		player.p = vec3_clone(spawn.p);
-		player.p.y += 32; // Drop from sky
-		player.v = vec3(0, 0, 0);
+		game_entity_player.v = vec3(0, 0, 0);
 	}
 	
 	// Spawn 3 bot competitors
@@ -61,22 +58,26 @@ arena_init = () => {
 	console.log('Arena Showdown started! 3 minutes, last one standing wins!');
 };
 
-// Spawn AI competitors
+// Spawn AI competitors at valid entity positions
 arena_spawn_bots = () => {
 	arena_bots = [];
-	let used_spawns = [];
+	let valid_spawns = [];
 	
-	for (let i = 0; i < arena_bot_count; i++) {
-		// Find unused spawn point
-		let available = arena_spawn_points.filter(s => !used_spawns.includes(s));
-		if (available.length === 0) break;
+	// Find valid spawn positions from existing entities (they have floor beneath them)
+	for (let e of game_entities) {
+		if (e.p && (e instanceof entity_pickup_health_t || e instanceof entity_pickup_nailgun_t)) {
+			valid_spawns.push(vec3_clone(e.p));
+		}
+	}
+	
+	// Spawn bots at valid positions
+	for (let i = 0; i < arena_bot_count && i < valid_spawns.length; i++) {
+		let spawn_pos = valid_spawns[i % valid_spawns.length];
+		// Offset slightly to avoid stacking
+		spawn_pos.x += (Math.random() - 0.5) * 64;
+		spawn_pos.z += (Math.random() - 0.5) * 64;
 		
-		let spawn = available[Math.floor(Math.random() * available.length)];
-		used_spawns.push(spawn);
-		
-		// Spawn bot
-		let bot = game_spawn(entity_bot_player_t, vec3_clone(spawn.p));
-		bot.p.y += 32; // Drop from sky
+		let bot = game_spawn(entity_bot_player_t, spawn_pos);
 		arena_bots.push(bot);
 	}
 };
