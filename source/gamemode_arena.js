@@ -1,5 +1,6 @@
 // Arena Showdown Game Mode for Q1K3
 // Single round, last-player-standing gameplay with shrinking safe zone
+// Uses existing enemy AI (grunts, enforcers, hounds) as competitors
 
 let
 	arena_round_time = 180,
@@ -7,10 +8,7 @@ let
 	arena_round_active = 0,
 	arena_kills = 0,
 	arena_winner = null,
-	arena_spawn_points = [],
 	arena_safe_zone = null,
-	arena_bots = [],
-	arena_bot_count = 3,
 	game_state = 0,
 	GAME_STATE_ARENA = 1,
 	GAME_STATE_POST_ROUND = 2;
@@ -24,25 +22,6 @@ arena_init = () => {
 	arena_winner = null;
 	game_state = GAME_STATE_ARENA;
 	
-	// Find all spawn points
-	arena_spawn_points = [];
-	for (let e of game_entities) {
-		if (e instanceof entity_spawn_point_t) {
-			arena_spawn_points.push(e);
-		}
-	}
-	
-	// If no spawn points defined, use default positions at floor level
-	if (arena_spawn_points.length === 0) {
-		// Valid floor positions from m1.map (Y is vertical in Quake coords)
-		arena_spawn_points = [
-			{p: vec3(1088, 96, 712)},   // Original spawn - courtyard
-			{p: vec3(100, 96, 1500)},  // West side
-			{p: vec3(2000, 96, 1500)}, // East side  
-			{p: vec3(1200, 96, 200)}   // North side
-		];
-	}
-	
 	// Spawn safe zone in center of arena
 	arena_safe_zone = game_spawn(entity_safe_zone_t, vec3(1000, 0, 1500), 2500, 0);
 	
@@ -52,34 +31,23 @@ arena_init = () => {
 		game_entity_player.v = vec3(0, 0, 0);
 	}
 	
-	// Spawn 3 bot competitors
-	arena_spawn_bots();
-	
 	console.log('Arena Showdown started! 3 minutes, last one standing wins!');
+	console.log('Existing enemies in map:', count_enemies(), 'competitors');
 };
 
-// Spawn AI competitors at valid entity positions
-arena_spawn_bots = () => {
-	arena_bots = [];
-	let valid_spawns = [];
-	
-	// Find valid spawn positions from existing entities (they have floor beneath them)
+// Count existing enemy entities
+let count_enemies = () => {
+	let count = 0;
 	for (let e of game_entities) {
-		if (e.p && (e instanceof entity_pickup_health_t || e instanceof entity_pickup_nailgun_t)) {
-			valid_spawns.push(vec3_clone(e.p));
+		if (e instanceof entity_enemy_grunt_t || 
+		    e instanceof entity_enemy_enforcer_t || 
+		    e instanceof entity_enemy_hound_t ||
+		    e instanceof entity_enemy_ogre_t ||
+		    e instanceof entity_enemy_zombie_t) {
+			count++;
 		}
 	}
-	
-	// Spawn bots at valid positions
-	for (let i = 0; i < arena_bot_count && i < valid_spawns.length; i++) {
-		let spawn_pos = valid_spawns[i % valid_spawns.length];
-		// Offset slightly to avoid stacking
-		spawn_pos.x += (Math.random() - 0.5) * 64;
-		spawn_pos.z += (Math.random() - 0.5) * 64;
-		
-		let bot = game_spawn(entity_bot_player_t, spawn_pos);
-		arena_bots.push(bot);
-	}
+	return count;
 };
 
 // Update arena mode - called every frame from game.js
@@ -93,7 +61,7 @@ arena_update = () => {
 		return;
 	}
 	
-	// Count alive competitors (player + bots)
+	// Count alive competitors (player + existing enemies)
 	let alive_count = 0;
 	let last_alive = null;
 	
@@ -106,25 +74,31 @@ arena_update = () => {
 		}
 	}
 	
-	// Check bots
-	for (let bot of arena_bots) {
-		if (!bot._dead) {
+	// Check existing enemies
+	let enemies_alive = 0;
+	for (let e of game_entities) {
+		if ((e instanceof entity_enemy_grunt_t || 
+		     e instanceof entity_enemy_enforcer_t || 
+		     e instanceof entity_enemy_hound_t ||
+		     e instanceof entity_enemy_ogre_t ||
+		     e instanceof entity_enemy_zombie_t) && !e._dead) {
+			enemies_alive++;
 			alive_count++;
-			last_alive = bot;
+			last_alive = e;
 		}
 	}
 	
 	// Win condition: only one remaining
 	if (alive_count === 1 && last_alive) {
 		arena_winner = last_alive;
-		let winner_name = last_alive instanceof entity_bot_player_t ? 'BOT' : 'YOU';
-		arena_end_round(winner_name + ' WINS!');
+		let winner_name = last_alive instanceof entity_player_t ? 'YOU' : 'ENEMY';
+		arena_end_round(winner_name + ' WIN!');
 	}
 	
-	// Lose condition: player died but bots remain
+	// Lose condition: player died but enemies remain
 	if (typeof game_entity_player !== 'undefined' && game_entity_player) {
 		let player = game_entity_player;
-		if (player._dead && alive_count > 0) {
+		if (player._dead && enemies_alive > 0) {
 			arena_end_round('ELIMINATED');
 		}
 	}
@@ -141,28 +115,12 @@ arena_end_round = (reason) => {
 	console.log('Time:', Math.floor(180 - arena_time_remaining), 'seconds');
 	
 	if (arena_winner) {
-		if (arena_winner instanceof entity_bot_player_t) {
-			console.log('Winner: BOT');
-		} else {
+		if (arena_winner instanceof entity_player_t) {
 			console.log('Winner: YOU!');
+		} else {
+			console.log('Winner: ENEMY');
 		}
 	}
-};
-
-// Draw arena UI - called from game.js render loop
-arena_draw_ui = () => {
-	// Format time as M:SS
-	let mins = Math.floor(arena_time_remaining / 60);
-	let secs = Math.floor(arena_time_remaining % 60);
-	let time_str = mins + ':' + (secs < 10 ? '0' : '') + secs;
-	
-	// Draw timer and kill count at top of screen
-	// This is a placeholder - actual UI would use canvas/webgl text
-	/*DEBUG[*/
-	if (arena_round_active) {
-		console.log('Time:', time_str, '| Kills:', arena_kills);
-	}
-	/*]*/
 };
 
 // Safe zone damage check - called from player/enemy update
@@ -177,7 +135,10 @@ arena_check_safe_zone = (entity) => {
 		
 		if (entity._health <= 0 && !entity._dead) {
 			entity._kill();
-			if (entity instanceof entity_bot_player_t) {
+			// Track kills
+			if (entity instanceof entity_enemy_grunt_t || 
+			    entity instanceof entity_enemy_enforcer_t || 
+			    entity instanceof entity_enemy_hound_t) {
 				arena_kills++;
 			}
 		}
