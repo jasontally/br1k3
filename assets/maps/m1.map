@@ -3177,26 +3177,3 @@
     "dir" "0"
 }
 
-{
-    "classname" "info_player_start"
-    "origin" "1088 3100 600"
-    "angle" "180"
-}
-
-{
-    "classname" "info_player_start"
-    "origin" "100 1500 600"
-    "angle" "90"
-}
-
-{
-    "classname" "info_player_start"
-    "origin" "2000 1500 500"
-    "angle" "270"
-}
-
-{
-    "classname" "info_player_start"
-    "origin" "1200 200 650"
-    "angle" "0"
-}
