@@ -48,8 +48,8 @@ arena_init = () => {
 	
 	// Random spawn for player
 	let spawn = arena_spawn_points[Math.floor(Math.random() * arena_spawn_points.length)];
-	if (entity_player_t._instances && entity_player_t._instances.length > 0) {
-		let player = entity_player_t._instances[0];
+	if (typeof game_entity_player !== 'undefined' && game_entity_player) {
+		let player = game_entity_player;
 		player.p = vec3_clone(spawn.p);
 		player.p.y += 32; // Drop from sky
 		player.v = vec3(0, 0, 0);
@@ -97,8 +97,8 @@ arena_update = () => {
 	let last_alive = null;
 	
 	// Check player
-	if (entity_player_t._instances && entity_player_t._instances.length > 0) {
-		let player = entity_player_t._instances[0];
+	if (typeof game_entity_player !== 'undefined' && game_entity_player) {
+		let player = game_entity_player;
 		if (!player._dead) {
 			alive_count++;
 			last_alive = player;
@@ -121,8 +121,8 @@ arena_update = () => {
 	}
 	
 	// Lose condition: player died but bots remain
-	if (entity_player_t._instances && entity_player_t._instances.length > 0) {
-		let player = entity_player_t._instances[0];
+	if (typeof game_entity_player !== 'undefined' && game_entity_player) {
+		let player = game_entity_player;
 		if (player._dead && alive_count > 0) {
 			arena_end_round('ELIMINATED');
 		}

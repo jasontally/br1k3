@@ -80,8 +80,8 @@ class entity_bot_player_t extends entity_player_t {
 		let best_dist = 99999;
 		
 		// Check player
-		if (entity_player_t._instances && entity_player_t._instances.length > 0) {
-			let player = entity_player_t._instances[0];
+		if (typeof game_entity_player !== 'undefined' && game_entity_player) {
+			let player = game_entity_player;
 			if (!player._dead) {
 				let dist = vec3_dist(this.p, player.p);
 				if (dist < best_dist && this._can_see(player.p)) {
