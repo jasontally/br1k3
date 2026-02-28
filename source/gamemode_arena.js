@@ -32,14 +32,14 @@ arena_init = () => {
 		}
 	}
 	
-	// If no spawn points defined, use default positions
+	// If no spawn points defined, use default positions at floor level
 	if (arena_spawn_points.length === 0) {
-		// Default arena spawn points around m1.map
+		// Valid floor positions from m1.map (Y is vertical in Quake coords)
 		arena_spawn_points = [
-			{p: vec3(1088, 3100, 600)},
-			{p: vec3(100, 1500, 600)},
-			{p: vec3(2000, 1500, 500)},
-			{p: vec3(1200, 200, 650)}
+			{p: vec3(1088, 96, 712)},   // Original spawn - courtyard
+			{p: vec3(100, 96, 1500)},  // West side
+			{p: vec3(2000, 96, 1500)}, // East side  
+			{p: vec3(1200, 96, 200)}   // North side
 		];
 	}
 	

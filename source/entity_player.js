@@ -72,7 +72,12 @@ class entity_player_t extends entity_t {
 		this._bob += vec3_length(this.a) * 0.0001;
 		this.f = this._on_ground ? 10 : 2.5;
 		this._update_physics();
-
+		
+		// Safe zone damage check
+		if (typeof arena_check_safe_zone === 'function') {
+			arena_check_safe_zone(this);
+		}
+		
 		r_camera.x = this.p.x;
 		r_camera.z = this.p.z;
 
