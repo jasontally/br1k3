@@ -7,9 +7,11 @@
 #HZ:#*
 #VS:*~
 
-# Ignore all markdown files except AGENTS.md
+# Ignore markdown files except these
 *.md
 !AGENTS.md
+!README.md
+!LICENSE.md
 
 # macOS
 .DS_Store
