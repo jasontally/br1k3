@@ -3154,10 +3154,6 @@
     "origin" "1796 1268 316"
 }
 
-{
-    "classname" "trigger_levelchange"
-    "origin" "1936 992 416"
-}
 
 {
     "classname" "pickup_health"

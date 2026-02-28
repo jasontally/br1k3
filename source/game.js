@@ -22,9 +22,9 @@ game_init = (map_index) => {
 	game_map_index = map_index;
 	map_init(map_data[game_map_index]);
 	
-	// Initialize arena showdown mode for first map only
+	// Initialize arena showdown mode for first map only (after entities are spawned)
 	if (map_index === 0 && typeof arena_init === 'function') {
-		arena_init();
+		setTimeout(arena_init, 100);
 	}
 },
 

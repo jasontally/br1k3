@@ -4,12 +4,12 @@
 class entity_bot_player_t extends entity_player_t {
 	_init() {
 		// Initialize as player with default weapon (shotgun)
-		this._model = model_player;
+		this._model = model_grunt;
 		this._texture = 4;
 		this._health = 100;
 		this._max_health = 100;
-		this._weapon = weapon_shotgun;
-		this._weapons = [weapon_shotgun];
+		this._weapon = new weapon_shotgun_t;
+		this._weapons = [this._weapon];
 		this._ammo = [0, 50, 10]; // Shells, nails, grenades
 		this._speed = 240;
 		this._dead = 0;
@@ -112,7 +112,7 @@ class entity_bot_player_t extends entity_player_t {
 			this._ai_state = 'hunt';
 			this._ai_target = best_target;
 			this._ai_target_pos = vec3_clone(best_target.p);
-		} else if (this._weapon === weapon_shotgun && this._ammo[0] < 10) {
+		} else if (this._weapon instanceof weapon_shotgun_t && this._ammo[0] < 10) {
 			// Low ammo - look for better weapon
 			this._ai_state = 'loot';
 			this._find_nearest_pickup('weapon');
@@ -309,7 +309,7 @@ class entity_bot_player_t extends entity_player_t {
 	
 	_kill() {
 		// Drop weapon on death
-		if (this._weapon && this._weapon !== weapon_shotgun) {
+		if (this._weapon && !(this._weapon instanceof weapon_shotgun_t)) {
 			// Could spawn weapon pickup here
 		}
 		
